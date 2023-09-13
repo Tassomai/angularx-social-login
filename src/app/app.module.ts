@@ -19,12 +19,7 @@ import {
 
 @NgModule({
   declarations: [AppComponent, NavbarComponent, DemoComponent],
-  imports: [
-    BrowserModule,
-    FormsModule,
-    SocialLoginModule,
-    GoogleSigninButtonModule,
-  ],
+  imports: [BrowserModule, FormsModule, SocialLoginModule, GoogleSigninButtonModule],
   providers: [
     {
       provide: 'SocialAuthServiceConfig',
@@ -34,7 +29,7 @@ import {
           {
             id: GoogleLoginProvider.PROVIDER_ID,
             provider: new GoogleLoginProvider(
-              '671722110340-q347rslrsre5nnjvrb9ci8r61u2mi9qr.apps.googleusercontent.com'
+              '624796833023-clhjgupm0pu6vgga7k5i5bsfp6qp6egh.apps.googleusercontent.com'
             ),
           },
           {
