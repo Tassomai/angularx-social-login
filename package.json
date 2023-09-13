@@ -1,67 +1,47 @@
 {
-  "name": "@abacritt/angularx-social-login-ws",
+  "name": "@abacritt/angularx-social-login",
   "version": "2.1.0",
-  "scripts": {
-    "ng": "ng",
-    "start": "ng serve",
-    "build-lib": "ng build lib",
-    "build-lib-prod": "ng build lib --configuration production",
-    "deploy": "cd dist/lib && npm publish",
-    "build": "ng build",
-    "test": "ng test",
-    "lint": "ng lint",
-    "e2e": "ng e2e",
-    "prepare": "husky install"
+  "description": "Social login and authentication module for Angular 14. Supports authentication with Google, Facebook, Amazon, and VK. Can be extended to other providers also.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abacritt/angularx-social-login.git"
   },
-  "private": true,
+  "author": "Jaibatrik Dutta <jaibatrik@gmail.com>",
+  "keywords": [
+    "angular",
+    "angular15",
+    "angular-social-login",
+    "social-authentication",
+    "social-login",
+    "google-authentication",
+    "facebook-authentication",
+    "amazon-authentication"
+  ],
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/abacritt/angularx-social-login/issues"
+  },
   "dependencies": {
-    "@angular/animations": "^13.3.12",
-    "@angular/common": "^13.3.12",
-    "@angular/compiler": "^13.3.12",
-    "@angular/core": "^13.3.12",
-    "@angular/forms": "^13.3.12",
-    "@angular/platform-browser": "^13.3.12",
-    "@angular/platform-browser-dynamic": "^13.3.12",
-    "@angular/router": "^13.3.12",
-    "rxjs": "^6.5.3",
-    "tslib": "^2.4.1",
-    "zone.js": "~0.11.8"
+    "tslib": ">=2.5.0"
   },
-  "devDependencies": {
-    "@angular-devkit/build-angular": "^13.3.10",
-    "@angular-eslint/builder": "13.5.0",
-    "@angular-eslint/eslint-plugin": "13.5.0",
-    "@angular-eslint/eslint-plugin-template": "13.5.0",
-    "@angular-eslint/schematics": "13.5.0",
-    "@angular-eslint/template-parser": "13.5.0",
-    "@angular/cli": "^13.3.10",
-    "@angular/compiler-cli": "^13.3.12",
-    "@angular/language-service": "^13.3.12",
-    "@types/google.accounts": "^0.0.7",
-    "@types/jasmine": "^4.3.1",
-    "@types/jasminewd2": "^2.0.10",
-    "@types/node": "^20.1.0",
-    "@typescript-eslint/eslint-plugin": "^5.59.2",
-    "@typescript-eslint/parser": "^5.59.2",
-    "eslint": "^8.39.0",
-    "husky": "^8.0.3",
-    "jasmine-core": "~4.6.0",
-    "jasmine-spec-reporter": "~7.0.0",
-    "karma": "~6.4.1",
-    "karma-chrome-launcher": "~3.1.0",
-    "karma-coverage-istanbul-reporter": "^3.0.2",
-    "karma-jasmine": "~4.0.0",
-    "karma-jasmine-html-reporter": "^1.5.0",
-    "lint-staged": "^13.2.2",
-    "ng-packagr": "^16.0.0",
-    "protractor": "~7.0.0",
-    "ts-node": "~10.9.1",
-    "typescript": "~4.6.4"
+  "peerDependencies": {
+    "@angular/common": ">=16.0.0",
+    "@angular/core": ">=16.0.0"
   },
-  "engines": {
-    "node": ">=18.7.0"
+  "homepage": "https://github.com/abacritt/angularx-social-login#readme",
+  "main": "bundles/abacrit-angularx-social-login.umd.js",
+  "module": "fesm2022/abacritt-angularx-social-login.mjs",
+  "typings": "index.d.ts",
+  "exports": {
+    "./package.json": {
+      "default": "./package.json"
+    },
+    ".": {
+      "types": "./index.d.ts",
+      "esm2022": "./esm2022/abacritt-angularx-social-login.mjs",
+      "esm": "./esm2022/abacritt-angularx-social-login.mjs",
+      "default": "./fesm2022/abacritt-angularx-social-login.mjs"
+    }
   },
-  "lint-staged": {
-    "*.js": "npm run lint -- --cache --fix"
-  }
+  "sideEffects": false
 }
