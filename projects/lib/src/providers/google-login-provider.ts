@@ -1,8 +1,8 @@
 import { BaseLoginProvider } from '../entities/base-login-provider';
 import { SocialUser } from '../entities/social-user';
-import { LoginProvider } from '../entities/login-provider';
 import { EventEmitter } from '@angular/core';
-import { BehaviorSubject, filter, skip, take } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
+import { filter, skip, take } from 'rxjs/operators';
 
 export interface GoogleInitOptions {
   /**
@@ -13,16 +13,31 @@ export interface GoogleInitOptions {
    * list of permission scopes to grant in case we request an access token
    */
   scopes?: string | string[];
+ /**
+   * This attribute sets the DOM ID of the container element. If it's not set, the One Tap prompt is displayed in the top-right corner of the window.
+   */
+  prompt_parent_id?: string;
+
+  /**
+   * Optional, defaults to 'select_account'.
+   * A space-delimited, case-sensitive list of prompts to present the
+   * user.
+   * Possible values are:
+   * empty string The user will be prompted only the first time your
+   *     app requests access. Cannot be specified with other values.
+   * 'none' Do not display any authentication or consent screens. Must
+   *     not be specified with other values.
+   * 'consent' Prompt the user for consent.
+   * 'select_account' Prompt the user to select an account.
+   */
+  prompt? : '' | 'none' | 'consent' | 'select_account';
 }
 
 const defaultInitOptions: GoogleInitOptions = {
   oneTapEnabled: true,
 };
 
-export class GoogleLoginProvider
-  extends BaseLoginProvider
-  implements LoginProvider
-{
+export class GoogleLoginProvider extends BaseLoginProvider {
   public static readonly PROVIDER_ID: string = 'GOOGLE';
 
   public readonly changeUser = new EventEmitter<SocialUser | null>();
@@ -61,6 +76,8 @@ export class GoogleLoginProvider
                 const socialUser = this.createSocialUser(credential);
                 this._socialUser.next(socialUser);
               },
+              prompt_parent_id: this.initOptions?.prompt_parent_id,
+              itp_support: this.initOptions.oneTapEnabled
             });
 
             if (this.initOptions.oneTapEnabled) {
@@ -78,6 +95,7 @@ export class GoogleLoginProvider
               this._tokenClient = google.accounts.oauth2.initTokenClient({
                 client_id: this.clientId,
                 scope,
+                prompt : this.initOptions.prompt,
                 callback: (tokenResponse) => {
                   if (tokenResponse.error) {
                     this._accessToken.error({
@@ -101,24 +119,24 @@ export class GoogleLoginProvider
     });
   }
 
-  getLoginStatus(refreshToken?: boolean): Promise<SocialUser> {
+  getLoginStatus(): Promise<SocialUser> {
     return new Promise((resolve, reject) => {
       if (this._socialUser.value) {
-        if (refreshToken) {
-          google.accounts.id.revoke(this._socialUser.value.id, (response) => {
-            if (response.error) {
-              reject(response.error);
-            }
-            resolve(this._socialUser.value);
-          });
-        } else {
-          resolve(this._socialUser.value);
-        }
+        resolve(this._socialUser.value);
       } else {
         reject(
           `No user is currently logged in with ${GoogleLoginProvider.PROVIDER_ID}`
         );
       }
+    });
+  }
+
+  refreshToken(): Promise<SocialUser | null> {
+    return new Promise((resolve, reject) => {
+      google.accounts.id.revoke(this._socialUser.value.id, (response) => {
+        if (response.error) reject(response.error);
+        else resolve(this._socialUser.value);
+      });
     });
   }
 
@@ -158,6 +176,14 @@ export class GoogleLoginProvider
     });
   }
 
+  signIn(): Promise<SocialUser> {
+    return Promise.reject(
+      'You should not call this method directly for Google, use "<asl-google-signin-button>" wrapper ' +
+        'or generate the button yourself with "google.accounts.id.renderButton()" ' +
+        '(https://developers.google.com/identity/gsi/web/guides/display-button#javascript)'
+    );
+  }
+
   async signOut(): Promise<void> {
     google.accounts.id.disableAutoSelect();
     this._socialUser.next(null);
@@ -177,6 +203,16 @@ export class GoogleLoginProvider
   }
 
   private decodeJwt(idToken: string): Record<string, string | undefined> {
-    return JSON.parse(window.atob(idToken.split('.')[1]));
+    const base64Url = idToken.split(".")[1];
+    const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+    const jsonPayload = decodeURIComponent(
+      window.atob(base64)
+        .split("")
+        .map(function (c) {
+          return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2);
+        })
+        .join("")
+    );
+    return JSON.parse(jsonPayload);
   }
 }

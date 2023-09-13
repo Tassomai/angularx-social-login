@@ -2,18 +2,21 @@
 
 > Use [Discussions](https://github.com/abacritt/angularx-social-login/discussions) for questions.
 
-Social login and authentication module for Angular 13. Supports authentication with **Google**, **Facebook**, **Amazon**, **Microsoft**, and **VK** out of the box. Can be extended to other providers also.
+Social login and authentication module for Angular 16. Supports authentication with **Google**, **Facebook**, **Amazon**, **Microsoft**, and **VK** out of the box. Can be extended to other
+providers also.
 
 Check out the [demo](https://abacritt.github.io/angularx-social-login/).
 
 ### Compatibility Matrix
 
 | Library Version                       | Angular Version |
-| ------------------------------------- |-----------------|
-| @abacritt/angularx-social-login:1     | 13              |
-| angularx-social-login:4               | 12, 13          |
-| angularx-social-login:3               | 9, 10, 11       |
-| angularx-social-login:2               | 5, 6, 7, 8      |
+|---------------------------------------|-------------|
+| @abacritt/angularx-social-login:2.1.X | 16          |
+| @abacritt/angularx-social-login:2.0.X | 15, 16      |
+| @abacritt/angularx-social-login:1     | 13, 14, 15  |
+| angularx-social-login:4               | 12, 13      |
+| angularx-social-login:3               | 9, 10, 11   |
+| angularx-social-login:2               | 5, 6, 7, 8  |
 
 ## Getting started
 
@@ -102,11 +105,31 @@ export class DemoComponent {
 `GoogleLoginProvider` has no `signIn()` method as other providers, the login flow is triggered by a button that the **gis client** is generating.
 Calling `SocialAuthService.signIn(GoogleLoginProvider.PROVIDER_ID)` will have no effect.
 
-Instead make sure you [subscribed to the authentication state](#subscribe-to-the-authentication-state) and add the following `GoogleSigninButtonDirective` to your component template to wrap the 'Sign In With Google' button:
+Instead make sure you [subscribed to the authentication state](#subscribe-to-the-authentication-state) and add the following `GoogleSigninButtonDirective` (exported from the `GoogleSigninButtonModule`) to your component template to wrap the 'Sign In With Google' button:
+
+ALSO
+
+Check out the [Google button generator](https://developers.google.com/identity/gsi/web/tools/configurator).
+[Link to Button attributes](https://developers.google.com/identity/gsi/web/reference/html-reference#element_with_class_g_id_signin)
+
 
 ```html
-<asl-google-signin-button></asl-google-signin-button>
+<asl-google-signin-button type='icon' size='medium'></asl-google-signin-button>
 ```
+Options:
+|  Name          | Type      | Value                                                     | Default       |
+|----------------|-----------|-----------------------------------------------------------|---------------|
+| type           | string    | 'icon' or 'standard'                                      | 'icon'        |
+| size           | string    |  'small', 'medium' or 'large'                             | 'medium'      |
+| shape          | string    |  'square','circle','pill' or 'rectangular'                | 'rectangular' |
+| text           | string    |  'signin_with','signup_with'or 'continue_with'            | 'signin_with' |
+| width          | string    |  '200 - 400 '                                             |               |
+| theme          | string    |  'outline','filled_blue' or 'filled_black'                | 'outline'     |
+| logo_alignment | string    |  'left' or 'center'                                       | 'left'        |
+
+
+
+
 
 This will only work if the `GoogleLoginProvider` is registered in [SocialAuthServiceConfig](#import-the-module).
 
@@ -238,6 +261,38 @@ export class DemoComponent implements OnInit {
   <h4>{{ user.name }}</h4>
   <p>{{ user.email }}</p>
 </div>
+```
+
+## Custom Provider
+
+We can use a custom provider, implementing our own logic and needs like the following example:
+
+```typescript
+@Injectable({ providedIn: 'root' })
+export class MyCustomLoginProvider extends BaseLoginProvider {
+  public static readonly PROVIDER_ID = 'CUSTOM' as const;
+
+  constructor(/* infinite list of dependencies*/) {}
+}
+```
+```typescript
+@NgModule({
+  declarations: [AppComponent, NavbarComponent, DemoComponent],
+  imports: [BrowserModule, FormsModule, SocialLoginModule],
+  providers: [
+    {
+      provide: 'SocialAuthServiceConfig',
+      useValue: {
+        autoLogin: true,
+        providers: [
+          {
+            id: MyCustomLoginProvider.PROVIDER_ID,
+            provider: MyCustomLoginProvider,
+          },
+        ],
+      } as SocialAuthServiceConfig,
+    },
+  ],
 ```
 
 ## Specifying custom scopes, fields etc. on initialization
